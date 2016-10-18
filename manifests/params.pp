@@ -92,52 +92,94 @@ class apache::params inherits ::apache::version {
     $suphp_addhandler     = 'php5-script'
     $suphp_engine         = 'off'
     $suphp_configpath     = undef
-    $php_version          = '5'
-    $mod_packages         = {
-      # NOTE: The auth_cas module isn't available on RH/CentOS without providing dependency packages provided by EPEL.
-      'auth_cas'    => 'mod_auth_cas',
-      'auth_kerb'   => 'mod_auth_kerb',
-      'auth_mellon' => 'mod_auth_mellon',
-      'authnz_ldap' => $::apache::version::distrelease ? {
-        '7'     => 'mod_ldap',
-        default => 'mod_authz_ldap',
-      },
-      'fastcgi'     => 'mod_fastcgi',
-      'fcgid'       => 'mod_fcgid',
-      'geoip'       => 'mod_geoip',
-      'ldap'        => $::apache::version::distrelease ? {
-        '7'     => 'mod_ldap',
-        default => undef,
-      },
-      'pagespeed'   => 'mod-pagespeed-stable',
-      # NOTE: The passenger module isn't available on RH/CentOS without
-      # providing dependency packages provided by EPEL and passenger
-      # repositories. See
-      # https://www.phusionpassenger.com/library/install/apache/install/oss/el7/
-      'passenger'   => 'mod_passenger',
-      'perl'        => 'mod_perl',
-      'php5'        => $::apache::version::distrelease ? {
-        '5'     => 'php53',
-        default => 'php',
-      },
-      'phpXXX'      => 'php',
-      'proxy_html'  => 'mod_proxy_html',
-      'python'      => 'mod_python',
-      'security'    => 'mod_security',
-      # NOTE: The module for Shibboleth is not available on RH/CentOS without
-      # providing dependency packages provided by Shibboleth's repositories.
-      # See http://wiki.aaf.edu.au/tech-info/sp-install-guide
-      'shibboleth'  => 'shibboleth',
-      'ssl'         => 'mod_ssl',
-      'wsgi'        => 'mod_wsgi',
-      'dav_svn'     => 'mod_dav_svn',
-      'suphp'       => 'mod_suphp',
-      'xsendfile'   => 'mod_xsendfile',
-      'nss'         => 'mod_nss',
-      'shib2'       => 'shibboleth',
+    $php_version = '5.5'
+    if $::operatingsystem =~ /^[Aa]mazon$/ {
+      $mod_packages         = {
+        # NOTE: The auth_cas module isn't available on RH/CentOS without providing dependency packages provided by EPEL.
+        'auth_cas'    => 'mod_auth_cas',
+        'auth_kerb'   => 'mod24_auth_kerb',
+        'auth_mellon' => 'mod_auth_mellon',
+        'authnz_ldap' => 'mod_authz_ldap',
+        'fastcgi'     => 'mod_fastcgi',
+        'fcgid'       => 'mod24_fcgid',
+        'geoip'       => 'mod24_geoip',
+        'ldap'        => 'mod24_ldap',
+        'pagespeed'   => 'mod-pagespeed-stable',
+        # NOTE: The passenger module isn't available on RH/CentOS without
+        # providing dependency packages provided by EPEL and passenger
+        # repositories. See
+        # https://www.phusionpassenger.com/library/install/apache/install/oss/el7/
+        'passenger'   => 'mod_passenger',
+        'perl'        => 'mod24_perl',
+        'php5.5'      => 'php55',
+        'proxy_html'  => 'mod24_proxy_html',
+        'python'      => 'mod_python',
+        'security'    => 'mod24_security',
+        # NOTE: The module for Shibboleth is not available on RH/CentOS without
+        # providing dependency packages provided by Shibboleth's repositories.
+        # See http://wiki.aaf.edu.au/tech-info/sp-install-guide
+        'shibboleth'  => 'shibboleth',
+        'ssl'         => 'mod24_ssl',
+        'wsgi'        => 'mod24_wsgi',
+        'dav_svn'     => 'mod24_dav_svn',
+        'suphp'       => 'mod_suphp',
+        'xsendfile'   => 'mod_xsendfile',
+        'nss'         => 'mod24_nss',
+        'shib2'       => 'shibboleth',
+      }
+      $mod_libs             = {
+        'nss'    => 'libmodnss.so',
+        'php5.5' => 'libphp-5.5.so'
+      }
+
     }
-    $mod_libs             = {
-      'nss' => 'libmodnss.so',
+    else
+    {
+      $mod_packages         = {
+        # NOTE: The auth_cas module isn't available on RH/CentOS without providing dependency packages provided by EPEL.
+        'auth_cas'    => 'mod_auth_cas',
+        'auth_kerb'   => 'mod_auth_kerb',
+        'auth_mellon' => 'mod_auth_mellon',
+        'authnz_ldap' => $::apache::version::distrelease ? {
+          '7'     => 'mod_ldap',
+          default => 'mod_authz_ldap',
+        },
+        'fastcgi'     => 'mod_fastcgi',
+        'fcgid'       => 'mod_fcgid',
+        'geoip'       => 'mod_geoip',
+        'ldap'        => $::apache::version::distrelease ? {
+          '7'     => 'mod_ldap',
+          default => undef,
+        },
+        'pagespeed'   => 'mod-pagespeed-stable',
+        # NOTE: The passenger module isn't available on RH/CentOS without
+        # providing dependency packages provided by EPEL and passenger
+        # repositories. See
+        # https://www.phusionpassenger.com/library/install/apache/install/oss/el7/
+        'passenger'   => 'mod_passenger',
+        'perl'        => 'mod_perl',
+        'php5'        => $::apache::version::distrelease ? {
+          '5'     => 'php53',
+          default => 'php',
+        },
+        'proxy_html'  => 'mod_proxy_html',
+        'python'      => 'mod_python',
+        'security'    => 'mod_security',
+        # NOTE: The module for Shibboleth is not available on RH/CentOS without
+        # providing dependency packages provided by Shibboleth's repositories.
+        # See http://wiki.aaf.edu.au/tech-info/sp-install-guide
+        'shibboleth'  => 'shibboleth',
+        'ssl'         => 'mod_ssl',
+        'wsgi'        => 'mod_wsgi',
+        'dav_svn'     => 'mod_dav_svn',
+        'suphp'       => 'mod_suphp',
+        'xsendfile'   => 'mod_xsendfile',
+        'nss'         => 'mod_nss',
+        'shib2'       => 'shibboleth',
+      }
+      $mod_libs             = {
+        'nss'  => 'libmodnss.so',
+      }
     }
     $conf_template        = 'apache/httpd.conf.erb'
     $keepalive            = 'Off'

@@ -11,9 +11,18 @@ class apache::version {
   }
 
   case $::osfamily {
+    'Linux': {
+      if ($::operatingsystem == 'Amazon') {
+        $default = '2.4'
+      } elsif ($::operatingsystem == 'Fedora' and versioncmp($distrelease, '18') >= 0) or ($::operatingsystem != 'Fedora' and versioncmp($distrelease, '7') >= 0) {
+        $default = '2.4'
+      } else {
+        $default = '2.2'
+      }
+    }
     'RedHat': {
       if ($::operatingsystem == 'Amazon') {
-        $default = '2.2'
+        $default = '2.4'
       } elsif ($::operatingsystem == 'Fedora' and versioncmp($distrelease, '18') >= 0) or ($::operatingsystem != 'Fedora' and versioncmp($distrelease, '7') >= 0) {
         $default = '2.4'
       } else {

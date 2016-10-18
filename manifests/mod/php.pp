@@ -49,7 +49,16 @@ class apache::mod::php (
     $_package_name = undef
   }
 
-  $_lib = "libphp${php_version}.so"
+  # Determine if we have special lib
+  # added to handel Amazom php 5.5
+  $mod_libs = $::apache::params::mod_libs
+  if has_key($mod_libs, $mod) {
+    $_lib = $mod_libs[$mod]
+  } else {
+    $_lib = "libphp${php_version}.so"
+  }
+
+
   $_php_major = regsubst($php_version, '^(\d+)\..*$', '\1')
 
   if $::operatingsystem == 'SLES' {
