@@ -92,8 +92,9 @@ class apache::params inherits ::apache::version {
     $suphp_addhandler     = 'php5-script'
     $suphp_engine         = 'off'
     $suphp_configpath     = undef
-    $php_version = '5.5'
+
     if $::operatingsystem =~ /^[Aa]mazon$/ {
+      $php_version = '5.5'
       $mod_packages         = {
         # NOTE: The auth_cas module isn't available on RH/CentOS without providing dependency packages provided by EPEL.
         'auth_cas'    => 'mod_auth_cas',
@@ -111,7 +112,7 @@ class apache::params inherits ::apache::version {
         # https://www.phusionpassenger.com/library/install/apache/install/oss/el7/
         'passenger'   => 'mod_passenger',
         'perl'        => 'mod24_perl',
-        'php5.5'      => 'php55',
+        'php'         => 'php55',
         'proxy_html'  => 'mod24_proxy_html',
         'python'      => 'mod_python',
         'security'    => 'mod24_security',
@@ -135,6 +136,7 @@ class apache::params inherits ::apache::version {
     }
     else
     {
+      $php_version = '5'
       $mod_packages         = {
         # NOTE: The auth_cas module isn't available on RH/CentOS without providing dependency packages provided by EPEL.
         'auth_cas'    => 'mod_auth_cas',

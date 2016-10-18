@@ -10,7 +10,13 @@ class apache::mod::php (
   $php_version    = $::apache::params::php_version,
 ) inherits apache::params {
 
-  $mod = "php${php_version}"
+  if $::operatingsystem =~ /^[Aa]mazon$/ {
+    $mod = "php"
+  }
+  else
+  {
+    $mod = "php${php_version}"
+  }
 
   if defined(Class['::apache::mod::prefork']) {
     Class['::apache::mod::prefork']->File["${mod}.conf"]
