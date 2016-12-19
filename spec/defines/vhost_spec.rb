@@ -273,6 +273,8 @@ describe 'apache::vhost', :type => :define do
               'path'            => '/a',
               'url'             => 'http://backend-a/',
               'keywords'        => ['noquery', 'interpolate'],
+              'no_proxy_uris'       => ['/a/foo', '/a/bar'],
+              'no_proxy_uris_match' => ['/a/foomatch'],
               'reverse_cookies' => [
 								{
                   'path'          => '/a',
@@ -295,6 +297,8 @@ describe 'apache::vhost', :type => :define do
               'path'     => '/a',
               'url'      => 'http://backend-a/',
               'keywords' => ['noquery', 'interpolate'],
+              'no_proxy_uris'       => ['/a/foo', '/a/bar'],
+              'no_proxy_uris_match' => ['/a/foomatch'],
               'params'   => {
                       'retry'   => '0',
                       'timeout' => '5'
@@ -339,6 +343,7 @@ describe 'apache::vhost', :type => :define do
           'rewrite_base'                => '/',
           'rewrite_rule'                => '^index\.html$ welcome.html',
           'rewrite_cond'                => '%{HTTP_USER_AGENT} ^MSIE',
+          'rewrite_inherit'             => true,
           'setenv'                      => ['FOO=/bin/true'],
           'setenvif'                    => 'Request_URI "\.gif$" object_is_image=gif',
           'setenvifnocase'              => 'REMOTE_ADDR ^127.0.0.1 localhost=true',
@@ -449,6 +454,7 @@ describe 'apache::vhost', :type => :define do
       it { is_expected.to contain_class('apache::mod::fastcgi') }
       it { is_expected.to contain_class('apache::mod::headers') }
       it { is_expected.to contain_class('apache::mod::filter') }
+      it { is_expected.to contain_class('apache::mod::env') }
       it { is_expected.to contain_class('apache::mod::setenvif') }
       it { is_expected.to contain_concat('30-rspec.example.com.conf').with({
         'owner'   => 'root',
@@ -552,6 +558,8 @@ describe 'apache::vhost', :type => :define do
       it { is_expected.to contain_concat__fragment('rspec.example.com-rack') }
       it { is_expected.to contain_concat__fragment('rspec.example.com-redirect') }
       it { is_expected.to contain_concat__fragment('rspec.example.com-rewrite') }
+      it { is_expected.to contain_concat__fragment('rspec.example.com-rewrite').with(
+        :content => /^\s+RewriteOptions Inherit$/ ) }
       it { is_expected.to contain_concat__fragment('rspec.example.com-scriptalias') }
       it { is_expected.to contain_concat__fragment('rspec.example.com-serveralias') }
       it { is_expected.to contain_concat__fragment('rspec.example.com-setenv').with_content(

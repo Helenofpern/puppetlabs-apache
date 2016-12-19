@@ -9,6 +9,7 @@ class apache::mod::ssl (
   $ssl_pass_phrase_dialog  = 'builtin',
   $ssl_random_seed_bytes   = '512',
   $ssl_sessioncachetimeout = '300',
+  $ssl_stapling            = false,
   $ssl_mutex               = undef,
   $apache_version          = undef,
   $package_name            = undef,
@@ -67,8 +68,30 @@ class apache::mod::ssl (
     'Suse'    => '/var/lib/apache2/ssl_scache(512000)'
   }
 
-  ::apache::mod { 'ssl':
-    package => $package_name,
+  validate_bool($ssl_stapling)
+
+  $stapling_cache = $::osfamily ? {
+    'debian'  => "\${APACHE_RUN_DIR}/ocsp(32768)",
+    'redhat'  => '/run/httpd/ssl_stapling(32768)',
+    'freebsd' => '/var/run/ssl_stapling(32768)',
+    'gentoo'  => '/var/run/ssl_stapling(32768)',
+    'Suse'    => '/var/lib/apache2/ssl_stapling(32768)',
+  }
+
+  if $::osfamily == 'Suse' {
+    if defined(Class['::apache::mod::worker']){
+      $suse_path = '/usr/lib64/apache2-worker'
+    } else {
+      $suse_path = '/usr/lib64/apache2-worker'
+    }
+    ::apache::mod { 'ssl':
+      package  => $package_name,
+      lib_path => $suse_path,
+    }
+  } else {
+    ::apache::mod { 'ssl':
+      package => $package_name,
+    }
   }
 
   if versioncmp($_apache_version, '2.4') >= 0 {
@@ -84,13 +107,14 @@ class apache::mod::ssl (
   # $ssl_options
   # $ssl_openssl_conf_cmd
   # $session_cache
+  # $stapling_cache
   # $ssl_mutex
   # $ssl_random_seed_bytes
   # $ssl_sessioncachetimeout
   # $_apache_version
   file { 'ssl.conf':
     ensure  => file,
-    path    => "${::apache::mod_dir}/ssl.conf",
+    path    => $::apache::ssl_file,
     mode    => $::apache::file_mode,
     content => template('apache/mod/ssl.conf.erb'),
     require => Exec["mkdir ${::apache::mod_dir}"],
